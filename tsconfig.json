@@ -1,0 +1,15 @@
+{
+	"compilerOptions": {
+		"module": "commonjs",
+		"newLine": "LF",
+		"target": "es6",
+		"noUnusedLocals": true,
+		"noUnusedParameters": true,
+		"noImplicitAny": true,
+		"noImplicitReturns": true,
+		"strictNullChecks": false, // 关闭
+	},
+	"exclude": [
+		"node_modules/",
+	]
+}
