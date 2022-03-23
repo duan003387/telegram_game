@@ -21,7 +21,8 @@ const BotState = {
 const replyKeyboard1 = new ReplyKeyboard();
 const replyKeyboard2 = new ReplyKeyboard();
 
-const inlineKeyboard = new InlineKeyboard();
+const inlineKeyboard1 = new InlineKeyboard();
+const inlineKeyboard2 = new InlineKeyboard();
 
 const firstReplyKeyboardRowToShowConstructor = new Row(
 	new KeyboardButton("👫 play with friends"),
@@ -72,17 +73,35 @@ replyKeyboard2
 	);
 
 
-inlineKeyboard
-	.push(
-		new Row(
-			new InlineKeyboardButton("DownLoad Game", "url", "https://play.google.com/store/apps/details?id=com.mxtech.videoplayer.ad&hl=en_US&gl=US"),
-			// new InlineKeyboardButton("1:2 Button", "callback_data", "Works 2!"),
-		),
-		// new Row(
-		// 	new InlineKeyboardButton("2:1 Button", "callback_data", "Works 3!"),
-		// 	new InlineKeyboardButton("2:2 Button", "callback_data", "Works 4!"),
-		// ),
-	);
+inlineKeyboard1.push(
+	new Row(
+		new InlineKeyboardButton("DownLoad Game", "url", "https://play.google.com/store/apps/details?id=com.mxtech.videoplayer.ad&hl=en_US&gl=US"),
+	),
+	// new Row(
+	// 	new InlineKeyboardButton("2:1 Button", "callback_data", "Works 3!"),
+	// 	new InlineKeyboardButton("2:2 Button", "callback_data", "Works 4!"),
+	// ),
+);
+
+inlineKeyboard2.push(
+	new Row(
+		// {
+		// 	text: "",
+		// 	url: "",
+		// 	login_url: "",
+		// 	callback_data: "",
+		// 	switch_inline_query: "",
+		// 	switch_inline_query_current_chat: "",
+		// 	callback_game: "",
+		// 	pay: "",
+		// }
+		new InlineKeyboardButton("Play With Friend", "switch_inline_query", "@", "callback_data","sleect a game"),
+	),
+	// new Row(
+	// 	new InlineKeyboardButton("2:1 Button", "callback_data", "Works 3!"),
+	// 	new InlineKeyboardButton("2:2 Button", "callback_data", "Works 4!"),
+	// ),
+);
 
 
 function hasBotCommands(entities: TelegramBot.MessageEntity[]) {
@@ -111,7 +130,7 @@ bot.onText(/\/forceReply/i, (msg) => {
 
 bot.onText(/\/download/i, (msg) => {
 	const options: TelegramBot.SendMessageOptions = {
-		reply_markup: inlineKeyboard.getMarkup()
+		reply_markup: inlineKeyboard2.getMarkup()
 	}
 
 	bot.sendMessage(msg.from.id, `Hi ${msg.from.first_name},we just created your new Mxplayer account\n\nDownload Mxplayer now and start winning cash!`, options);
@@ -150,7 +169,15 @@ bot.on("message", async (msg) => {
 				bot.sendGame(msg.from.id, "game_plus");
 			}
 			if (msg.text === "Game5") {
-
+				// const messageOptions: TelegramBot.SendMessageOptions = {
+				// 	entities: [{
+				// 		type: "text_mention",
+				// 		offset: 1,
+				// 		length: 1,
+				// 		user?: User
+				// 	}]
+				// };
+				// await bot.sendMessage(msg.from.id, "This is a message with a reply keyboard. Click on one of the buttons to close it.", messageOptions);
 			}
 			// console.log(JSON.stringify(msg), "reply_to_message");
 		} else if (!!msg.reply_to_message) {
@@ -162,24 +189,24 @@ bot.on("message", async (msg) => {
 
 process.env.SIGN_SECRET = "process.env.SIGN_SECRET";
 bot.on("callback_query", async (query) => {
+	console.log(JSON.stringify(query), "++++++++");
 	const token = jws.sign({
 		header: { alg: 'HS512' },
 		payload: {
 			game: query.game_short_name,
-			user: query.message.from.id,
+			user: query.from.id,
 			imessage: query.inline_message_id,
 			message: (query.message || {}).message_id,
-			chat_id: query.message.chat.id
+			chat_id: query.message ? query.message.chat.id : undefined
 		},
 		secret: process.env.SIGN_SECRET
 	})
 
-
 	if (query.game_short_name === "duan") {
 		bot.answerCallbackQuery(query.id, { url: 'https://mxshorts.akamaized.net/game/prod/takblockpuzzle/index.html', cache_time: 3 })
 	} else if (query.game_short_name === "duan_6415") {
-		// bot.answerCallbackQuery(query.id, { url: `https://duan003387.github.io/Car3D/index.html?token=${token}`, cache_time: 3 })
-		bot.answerCallbackQuery(query.id, { url: `http://192.168.3.207:7458/web-mobile/web-mobile/index.html?token=${token}`, cache_time: 3 });
+		bot.answerCallbackQuery(query.id, { url: `https://duan003387.github.io/Car3D/index.html?token=${token}`, cache_time: 3 })
+		// bot.answerCallbackQuery(query.id, { url: `http://192.168.3.154:7456/web-mobile/web-mobile/index.html?token=${token}`, cache_time: 3 });
 	} else if (query.game_short_name === "game_crazydunk") {
 		bot.answerCallbackQuery(query.id, { url: 'https://mxgames.akamaized.net/game/prod/takccrazydunk/index.html', cache_time: 3 });
 	} else if (query.game_short_name === "game_plus") {
