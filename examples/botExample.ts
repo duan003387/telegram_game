@@ -95,7 +95,7 @@ inlineKeyboard2.push(
 		// 	callback_game: "",
 		// 	pay: "",
 		// }
-		new InlineKeyboardButton("Play With Friend", "switch_inline_query", "@", "callback_data","sleect a game"),
+		new InlineKeyboardButton("Play With Friend", "switch_inline_query", "@", "callback_data", "sleect a game"),
 	),
 	// new Row(
 	// 	new InlineKeyboardButton("2:1 Button", "callback_data", "Works 3!"),
@@ -161,6 +161,7 @@ bot.on("message", async (msg) => {
 			}
 			if (msg.text === "Car3D") {
 				bot.sendGame(msg.from.id, "duan_6415");
+				bot.sendMessage(msg.from.id, "https://duan003387.github.io/airlift/index.html");
 			}
 			if (msg.text === "🏀 CrazyDunk") {
 				bot.sendGame(msg.from.id, "game_crazydunk");
@@ -189,7 +190,6 @@ bot.on("message", async (msg) => {
 
 process.env.SIGN_SECRET = "process.env.SIGN_SECRET";
 bot.on("callback_query", async (query) => {
-	console.log(JSON.stringify(query), "++++++++");
 	const token = jws.sign({
 		header: { alg: 'HS512' },
 		payload: {
@@ -205,10 +205,14 @@ bot.on("callback_query", async (query) => {
 	if (query.game_short_name === "duan") {
 		bot.answerCallbackQuery(query.id, { url: 'https://mxshorts.akamaized.net/game/prod/takblockpuzzle/index.html', cache_time: 3 })
 	} else if (query.game_short_name === "duan_6415") {
-		bot.answerCallbackQuery(query.id, { url: `https://duan003387.github.io/Car3D/index.html?token=${token}`, cache_time: 3 })
+		console.log(JSON.stringify(query),">>>>>>");
+		
+		bot.answerCallbackQuery(query.id, { url: `https://duan003387.github.io/Car3D/index.html`, cache_time: 3 })
+		// bot.answerCallbackQuery(query.id, { url: `http://192.199.1.108:7456/`, cache_time: 3 })
 		// bot.answerCallbackQuery(query.id, { url: `http://192.168.3.154:7456/web-mobile/web-mobile/index.html?token=${token}`, cache_time: 3 });
 	} else if (query.game_short_name === "game_crazydunk") {
-		bot.answerCallbackQuery(query.id, { url: 'https://mxgames.akamaized.net/game/prod/takccrazydunk/index.html', cache_time: 3 });
+		// bot.answerCallbackQuery(query.id, { url: 'https://mxgames.akamaized.net/game/prod/takccrazydunk/index.html', cache_time: 3 });
+		bot.answerCallbackQuery(query.id, { url: `http://192.168.2.6:7456/build/index.html?token=${token}`, cache_time: 3 });
 	} else if (query.game_short_name === "game_plus") {
 		bot.answerCallbackQuery(query.id, { url: 'https://mxgames.akamaized.net/game/prod/takplus/index.html', cache_time: 3 });
 	}
@@ -269,7 +273,7 @@ app.post('/score', async (req: any, res: any) => {
 	}
 
 	const { user, chat_id, imessage, message } = req.microGame;
-	console.log(user, chat_id, message);
+	// console.log(user, chat_id, message);
 
 	bot.setGameScore(user, scoreValue, {
 		// force: true,
@@ -278,11 +282,20 @@ app.post('/score', async (req: any, res: any) => {
 		chat_id: chat_id,
 		message_id: message
 	}).then(() => {
-		GetHighScoreList(user, imessage, chat_id, message, res);
+		console.log("setGameScore Success", scoreValue);
+		res.end(JSON.stringify({ status: "done" }, null, 0))
 	}).catch(() => {
-		GetHighScoreList(user, imessage, chat_id, message, res);
+		console.log("setGameScore Fail", scoreValue);
+		res.end(JSON.stringify({ status: "done" }, null, 0))
 	})
 })
+
+app.post('/highScoreList', async (req: any, res: any) => {
+	const { user, chat_id, imessage, message } = req.microGame;
+	GetHighScoreList(user, imessage, chat_id, message, res);
+})
+
+
 
 const GetHighScoreList = async (user: number, imessage: string, chat_id: number, message: number, res: any) => {
 	let scores = await bot.getGameHighScores(user, {
